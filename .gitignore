@@ -1,0 +1,8 @@
+.idea/
+*.pt
+train_data/
+train_data_*/
+weight/
+weight_*/
+onnx_saved/
+img_save_process/
