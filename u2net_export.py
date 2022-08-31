@@ -13,9 +13,9 @@ from torch import jit
 
 if __name__ == '__main__':
 
-    weight_path = r"weight\210.pth"
+    weight_path = r"weight\2.pth"
     img_save_path = r"D:\DRIVE\test\img_save_path"
-    onnx_save_path = r"onnx_saved\ZLU.onnx"
+    onnx_save_path = r"onnx_saved\XJLM.onnx"
 
     transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
 
@@ -28,11 +28,12 @@ if __name__ == '__main__':
         net = U2NETP(3, 1).to(device)
     if os.path.exists(weight_path):
         net.load_state_dict(torch.load(weight_path))
+        net.eval()
         print("load weight successfully!")
     batch_size = 1
     inputs = torch.randn(1,3,256,256)
     torch_model = jit.trace(net,inputs.to(device))
-    torch_model.save("XJTC_160GPU.pt")
+    torch_model.save("onnx_saved\XJLM.pt")
     # 导出onnx
     u2net_input = torch.randn(batch_size,3,256,256)
-    torch.onnx.export(net,u2net_input.to(device),onnx_save_path,input_names=["input"],output_names=["output"],dynamic_axes={"input":{0:"batch_size"},"output":{0:"batch_size"}})
+    torch.onnx.export(net,u2net_input.to(device),onnx_save_path,input_names=["input"],output_names=["output"],opset_version=11,dynamic_axes={"input":{0:"batch_size"},"output":{0:"batch_size"}})

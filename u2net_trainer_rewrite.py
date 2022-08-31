@@ -37,12 +37,15 @@ if not os.path.exists(img_save_path):
 while True:
     for i, (xs, ys) in enumerate(dataloader):
         xs = xs.to(device)
+        # print(xs.shape)
         ys = ys[:,0:1].to(device)
+        # print(ys.shape)
+        # ys = ys.to(device)
         xs_ = net(xs)
-        # print(xs_[0].shape)
+        # print(xs_.shape)
         # print(ys.shape)
 
-        loss = loss_func(xs_[0], ys)
+        loss = loss_func(xs_, ys)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -55,7 +58,8 @@ while True:
 
         x = xs[0][0:1]
         # print(x.shape)
-        x_ = xs_[0][0]
+        # x_ = xs_[0][0]
+        x_ = xs_[0]
         # print(x_.shape)
         y = ys[0]
         # print(y.shape)

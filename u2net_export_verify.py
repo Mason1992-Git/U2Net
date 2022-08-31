@@ -8,6 +8,7 @@ import torchvision
 import shutil
 import onnxruntime
 import math
+from onnxruntime.datasets import get_example
 
 def compare(face1, face2):
     face1_norm = F.normalize(face1)
@@ -64,16 +65,16 @@ def to_numpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 if __name__ == '__main__':
     weight_path = r"XJTC_160GPU.pt"
-    onnx_path = "ZLH.onnx"
-    img_path = r"D:\DXXJ_TEST\2"
-    save_path = r"D:\DXXJ_TEST\RESULTS"
+    onnx_path = "onnx_saved\XJLM.onnx"
+    img_path = r"D:\DXXJ_TEST\lmqs"
+    save_path = r"D:\DXXJ_TEST\onnx_results"
     defect_save_path = r"D:\DXXJ_TEST\DEFECT_RESULT"
     device = torch.device("cuda")
     NETWORK_WIDTH = 256
     SCALE_WIDTH = 0
     # 使用onnx或者torchscript
-    torchscript_flag = True
-    onnx_flag = False
+    torchscript_flag = False
+    onnx_flag = t = True
     transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
     if torchscript_flag:
         if os.path.exists(weight_path):
@@ -87,6 +88,27 @@ if __name__ == '__main__':
         output_name = model.get_outputs()[0].name
         print('Input Name:', input_name)
         print('Output Name:', output_name)
+    #     example_model = get_example(r"G:\09-UNET-EyeballSegmentation\onnx_saved\XJLM.onnx")
+    #     sess = onnxruntime.InferenceSession(r"G:\09-UNET-EyeballSegmentation\onnx_saved\XJLM.onnx",None)
+    # # dummy_input = torch.zeros(1, 3, 256, 256, device='cuda')
+    # ort_inputs = {sess.get_inputs()[0].name: to_numpy(dummy_input)}
+    # out = sess.run([sess.get_outputs()[0].name], ort_inputs)
+    # out = torch.tensor(out)
+    # x1 = out[0].cpu().clone().squeeze(0)
+    # print("onnx_out:", x1)
+    # img1 = torchvision.transforms.ToPILImage()(x1)
+    # print("onnx_out:", img1)
+    # # img1.show()
+    # img1.save(os.path.join(save_path,'onnx.png'))
+    #
+    # pt_out = model(dummy_input)
+    # x2 = pt_out[0].cpu().clone().squeeze(0)
+    # print("pt_out:", x2)
+    # img2 = torchvision.transforms.ToPILImage()(x2)
+    # print("pt_out:",img2)
+    # img2.save(os.path.join(save_path, 'pt.png'))
+
+
 
     for _name in os.listdir(os.path.join(img_path)):
         if _name.endswith("jpg") or _name.endswith("png"):
@@ -166,7 +188,7 @@ if __name__ == '__main__':
                 os.makedirs(os.path.join(save_path,"_mask1"))
             imgMASK1_save_path = os.path.join(save_path,"_mask1")
             cv2.imwrite(os.path.join(imgMASK1_save_path, _name), mask)
-            mask = FillHole(mask)
+            # mask = FillHole(mask)
             img = np.ones((NETWORK_WIDTH, NETWORK_WIDTH), dtype=np.uint8)
             bgr_img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
             bgr_img[:, :, 0] = 0
@@ -178,6 +200,8 @@ if __name__ == '__main__':
                     pixel = img_mask[i][j]
                     if pixel > 200:
                         r[i][j] = 255
+                    elif pixel > 60:
+                        g[i][j] = 255
                     elif pixel > 1:
                         g[i][j] = 255
                     else:
@@ -201,7 +225,7 @@ if __name__ == '__main__':
     for img_name in os.listdir(os.path.join(save_path,"_mask0")):
         print(os.path.join(os.path.join(save_path,"_mask0"), img_name))
         img_mask = cv2.imread(os.path.join(os.path.join(save_path,"_mask0"), img_name), 0)
-        ret, thresh = cv2.threshold(img_mask, 1, 255, cv2.THRESH_BINARY)
+        ret, thresh = cv2.threshold(img_mask, 200, 255, cv2.THRESH_BINARY)
         x,y = thresh.shape
         kernel = np.ones((3, 3), np.uint8)
         kernel_erode = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
@@ -219,7 +243,7 @@ if __name__ == '__main__':
         if not os.path.exists(os.path.join(save_path, "_open")):
             os.makedirs(os.path.join(save_path, "_open"))
         open_path = os.path.join(save_path, "_open")
-        cv2.imwrite(os.path.join(open_path, img_name), result)
+        cv2.imwrite(os.path.join(open_path, img_name), thresh)
         # mask = FillHole(result)
         #####################################################
         # num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
