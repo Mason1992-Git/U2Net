@@ -65,8 +65,8 @@ def to_numpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 if __name__ == '__main__':
     weight_path = r"XJTC_160GPU.pt"
-    onnx_path = "onnx_saved\XJLM.onnx"
-    img_path = r"D:\DXXJ_TEST\lmqs"
+    onnx_path = "onnx_saved\ZXMJ.onnx"
+    img_path = r"C:\Users\1\Documents\Tencent Files\1139417291\FileRecv\contact_line_anchor\contact_line_anchor"
     save_path = r"D:\DXXJ_TEST\onnx_results"
     defect_save_path = r"D:\DXXJ_TEST\DEFECT_RESULT"
     device = torch.device("cuda")
@@ -142,12 +142,12 @@ if __name__ == '__main__':
             if onnx_flag:
                 ort_inputs = {model.get_inputs()[0].name: to_numpy(input)}
                 out = model.run(None, ort_inputs)
-                print("type_out = ",type(out))
-                print(len(out))
+                # print("type_out = ",type(out))
+                # print(len(out))
                 out = torch.tensor(out)
             # print("out_shape>>",out.size())
             x = out[0].cpu().clone().squeeze(0)
-            print("x_shape>>", x.shape)
+            # print("x_shape>>", x.shape)
             img1 = torchvision.transforms.ToPILImage()(x)
             img1.save(os.path.join(img_save_path, f'{_name}.png'))
 
@@ -198,10 +198,10 @@ if __name__ == '__main__':
             for i in range(NETWORK_WIDTH):
                 for j in range(NETWORK_WIDTH):
                     pixel = img_mask[i][j]
-                    if pixel > 200:
+                    if pixel > 220:
                         r[i][j] = 255
-                    elif pixel > 60:
-                        g[i][j] = 255
+                    # elif pixel > 60:
+                    #     g[i][j] = 255
                     elif pixel > 1:
                         g[i][j] = 255
                     else:

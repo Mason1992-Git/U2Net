@@ -13,11 +13,11 @@ from torch import jit
 
 if __name__ == '__main__':
 
-    weight_path = r"weight\2.pth"
-    img_save_path = r"D:\DRIVE\test\img_save_path"
-    onnx_save_path = r"onnx_saved\XJLM.onnx"
+    weight_path = r"weight\250.pth"
+    # img_save_path = r"D:\DRIVE\test\img_save_path"
+    onnx_save_path = r"onnx_saved\ZXMJ.onnx"
 
-    transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
+    # transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
 
     model_name = "u2netp"
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     batch_size = 1
     inputs = torch.randn(1,3,256,256)
     torch_model = jit.trace(net,inputs.to(device))
-    torch_model.save("onnx_saved\XJLM.pt")
+    torch_model.save("onnx_saved\XZXMJ.pt")
     # 导出onnx
     u2net_input = torch.randn(batch_size,3,256,256)
     torch.onnx.export(net,u2net_input.to(device),onnx_save_path,input_names=["input"],output_names=["output"],opset_version=11,dynamic_axes={"input":{0:"batch_size"},"output":{0:"batch_size"}})
